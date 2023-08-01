@@ -1,6 +1,19 @@
 import streamlit as st
 import io
 import sys
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import LeaveOneOut
+from sklearn.naive_bayes import GaussianNB
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import StackingClassifier
+from sklearn.metrics import accuracy_score, classification_report
+from imblearn.over_sampling import SMOTE
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
 
 # Function that will generate the output to be shown
 def generate_output(user_input):
