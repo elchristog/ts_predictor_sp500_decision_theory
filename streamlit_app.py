@@ -1547,7 +1547,7 @@ def some_python_code(user_input):
 st.title('Streamlit Predict Button')
 
 # Text box for user input
-user_input = st.text_input('Enter a string:')
+user_input = st.text_input('Execute between 10 am and 11 am, if predicion for 11:00 to 12_30 is increase with >65% confidence, then invest (Never invest in a different schedule):')
 
 if st.button('Predict'):
     if user_input:  # Execute only if user has provided some input
