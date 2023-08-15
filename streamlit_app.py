@@ -51,66 +51,66 @@ def some_python_code(user_input):
         
         
         def train_model(data_encoded, le, feature_columns, target_column):
-        
-          # Separate the data into features (X) and the target variable (y)
-          X = data_encoded[feature_columns]
-          y = data_encoded[target_column]
-        
-          # Apply SMOTE
-          oversample = SMOTE(k_neighbors=2) # aumentar o quitar cuando tenga mas data, por defecto seria 6
-          X, y = oversample.fit_resample(X, y)
-        
-          # Define base models
-          base_models = [
-              ('gnb', GaussianNB()),
-              ('dt', DecisionTreeClassifier(random_state=42)),
-              ('knn', KNeighborsClassifier()),
-              # ('rf', RandomForestClassifier(random_state=42)),
-              ('svc', SVC(probability=True))
-          ]
-        
-          # Define meta-model
-          meta_model = LogisticRegression()
-        
-          # Create a StackingClassifier
-          clf = StackingClassifier(estimators=base_models, final_estimator=meta_model, cv=LeaveOneOut()) # LeaveOneOut pasarlo a 5 cuando tenga mas data para que sean 5 folds
-        
-          # Create a LeaveOneOut object
-          loo = LeaveOneOut()
-        
-          # Perform leave-one-out cross-validation
-          accuracy = []
-          tn = 0
-          fn = 0
-          fp = 0
-          tp = 0
-          for train_index, test_index in loo.split(X):
-              X_train, X_test = X.iloc[train_index], X.iloc[test_index]
-              y_train, y_test = y.iloc[train_index], y.iloc[test_index]
-        
-              # Train the model
-              clf.fit(X_train, y_train)
-        
-              # Predict the target variable for the testing set
-              y_pred = clf.predict(X_test)
-        
-              # Compute the accuracy of the model
-              accuracy.append(accuracy_score(y_test, y_pred))
-              if (y_test.values[0] == 0) and (y_pred[0] == 0):
-                tn = tn+1
-              elif (y_test.values[0] == 0) and (y_pred[0] == 1):
-                fn = fn+1
-              elif (y_test.values[0] == 1) and (y_pred[0] == 0):
-                fp = fp+1
-              elif (y_test.values[0] == 1) and (y_pred[0] == 1):
-                tp = tp+1
-        
-        
-          acc = sum(accuracy)/len(accuracy)
-          valores_confusion = np.array([[tn,fn],[fp,tp]])
-          print(f"{target_column} Accuracy in leave-one-out cross-validation: {acc}")
-          return clf, acc, valores_confusion
-        
+            
+              # Separate the data into features (X) and the target variable (y)
+              X = data_encoded[feature_columns]
+              y = data_encoded[target_column]
+            
+              # Apply SMOTE
+              oversample = SMOTE(k_neighbors=2) # aumentar o quitar cuando tenga mas data, por defecto seria 6
+              X, y = oversample.fit_resample(X, y)
+            
+              # Define base models
+              base_models = [
+                  ('gnb', GaussianNB()),
+                  ('dt', DecisionTreeClassifier(random_state=42)),
+                  ('knn', KNeighborsClassifier()),
+                  # ('rf', RandomForestClassifier(random_state=42)),
+                  ('svc', SVC(probability=True))
+              ]
+            
+              # Define meta-model
+              meta_model = LogisticRegression()
+            
+              # Create a StackingClassifier
+              clf = StackingClassifier(estimators=base_models, final_estimator=meta_model, cv=LeaveOneOut()) # LeaveOneOut pasarlo a 5 cuando tenga mas data para que sean 5 folds
+            
+              # Create a LeaveOneOut object
+              loo = LeaveOneOut()
+            
+              # Perform leave-one-out cross-validation
+              accuracy = []
+              tn = 0
+              fn = 0
+              fp = 0
+              tp = 0
+              for train_index, test_index in loo.split(X):
+                  X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+                  y_train, y_test = y.iloc[train_index], y.iloc[test_index]
+            
+                  # Train the model
+                  clf.fit(X_train, y_train)
+            
+                  # Predict the target variable for the testing set
+                  y_pred = clf.predict(X_test)
+            
+                  # Compute the accuracy of the model
+                  accuracy.append(accuracy_score(y_test, y_pred))
+                  if (y_test.values[0] == 0) and (y_pred[0] == 0):
+                    tn = tn+1
+                  elif (y_test.values[0] == 0) and (y_pred[0] == 1):
+                    fn = fn+1
+                  elif (y_test.values[0] == 1) and (y_pred[0] == 0):
+                    fp = fp+1
+                  elif (y_test.values[0] == 1) and (y_pred[0] == 1):
+                    tp = tp+1
+            
+            
+              acc = sum(accuracy)/len(accuracy)
+              valores_confusion = np.array([[tn,fn],[fp,tp]])
+              print(f"{target_column} Accuracy in leave-one-out cross-validation: {acc}")
+              return clf, acc, valores_confusion
+            
         
         
         
@@ -150,53 +150,53 @@ def some_python_code(user_input):
         
         
         def decision_theory_bayes_minimum_risk(predictions, confussion):
-        
-          tn = confussion[0,0]
-          fn = confussion[0,1]
-          fp = confussion[1,0]
-          tp = confussion[1,1]
-        
-          #Matriz de predicciones P (Prefiero llamarla matriz de precisión, Es similar a la matriz de confusión pero respecto a los valores reales y no a la predicción, filas son valores reales coluimnas son predccion y de ahi Sale la sensitividad y especificidad)
-          confusion=np.array([[tn/(tn+fn),fn/(tn+fn)],[fp/(tp+fp),tp/(tp+fp)]]) #Esta seria la matriz de confusion normal, el porcentaje es calculado respecto a la prediccion, de los que predije 0 a cuantos les atine y a cuantos no
-          # print("Matriz de confusion")
-          # print(confusion)
-          P=np.array([[tn/(tn+fp),fp/(tn+fp)],[fn/(fn+tp),tp/(fn+tp)]]) #Esta si es la matriz de presición, el porcentaje es calculado respecto al valor rteal, de los que eran 0 a cuantos les atine y a cuantos no
-          # print("Matriz P de precisión")
-          # print(P) #De todos los que son 0 a cuantos detecte y a cuantos no, de todos los que son 1 a cuantos detecte y a cuantos no
-        
-          #Matriz de frecuencua Q (Prefiero llamarla matriz de predicciones), probabilidad preducha de ser 0 y probabilidad predicha de ser 1
-          Q = [[predictions[0,0],0],[0,predictions[0,1]]]
-          # print("Matriz Q de predicciones")
-          # print(Q)
-        
-          #print(np.matmul((confusion.transpose()),Q))
-          #print(np.matmul((P.transpose()),Q))
-        
-          #print((P.transpose())*Q)#Mal multiplicadas
-        
-          #Matriz R
-          R=np.matmul((P.transpose()),Q)
-          # print("Matriz R")
-          # print(R)
-        
-          #Función de frecuencia de la predicción
-          prob0=R[0][0]+R[0][1]
-          prob1=R[1][0]+R[1][1]
-          # print("Función de frecuencia de la predicción 0")
-          # print(prob0)
-          # print("Función de frecuencia de la predicción 1")
-          # print(prob1)
-        
-          #Matriz estocastica P*
-          PAsterisco=np.array([[R[0][0]/prob0,R[0][1]/prob0],
-                              [R[1][0]/prob1,R[1][1]/prob1]])
-          # print("Matriz estocastica P*")
-          # print(PAsterisco)
-        
-          if prob0 >= prob1:
-            return [prob0,prob1], 0
-          else:
-            return [prob0,prob1], 1
+            
+              tn = confussion[0,0]
+              fn = confussion[0,1]
+              fp = confussion[1,0]
+              tp = confussion[1,1]
+            
+              #Matriz de predicciones P (Prefiero llamarla matriz de precisión, Es similar a la matriz de confusión pero respecto a los valores reales y no a la predicción, filas son valores reales coluimnas son predccion y de ahi Sale la sensitividad y especificidad)
+              confusion=np.array([[tn/(tn+fn),fn/(tn+fn)],[fp/(tp+fp),tp/(tp+fp)]]) #Esta seria la matriz de confusion normal, el porcentaje es calculado respecto a la prediccion, de los que predije 0 a cuantos les atine y a cuantos no
+              # print("Matriz de confusion")
+              # print(confusion)
+              P=np.array([[tn/(tn+fp),fp/(tn+fp)],[fn/(fn+tp),tp/(fn+tp)]]) #Esta si es la matriz de presición, el porcentaje es calculado respecto al valor rteal, de los que eran 0 a cuantos les atine y a cuantos no
+              # print("Matriz P de precisión")
+              # print(P) #De todos los que son 0 a cuantos detecte y a cuantos no, de todos los que son 1 a cuantos detecte y a cuantos no
+            
+              #Matriz de frecuencua Q (Prefiero llamarla matriz de predicciones), probabilidad preducha de ser 0 y probabilidad predicha de ser 1
+              Q = [[predictions[0,0],0],[0,predictions[0,1]]]
+              # print("Matriz Q de predicciones")
+              # print(Q)
+            
+              #print(np.matmul((confusion.transpose()),Q))
+              #print(np.matmul((P.transpose()),Q))
+            
+              #print((P.transpose())*Q)#Mal multiplicadas
+            
+              #Matriz R
+              R=np.matmul((P.transpose()),Q)
+              # print("Matriz R")
+              # print(R)
+            
+              #Función de frecuencia de la predicción
+              prob0=R[0][0]+R[0][1]
+              prob1=R[1][0]+R[1][1]
+              # print("Función de frecuencia de la predicción 0")
+              # print(prob0)
+              # print("Función de frecuencia de la predicción 1")
+              # print(prob1)
+            
+              #Matriz estocastica P*
+              PAsterisco=np.array([[R[0][0]/prob0,R[0][1]/prob0],
+                                  [R[1][0]/prob1,R[1][1]/prob1]])
+              # print("Matriz estocastica P*")
+              # print(PAsterisco)
+            
+              if prob0 >= prob1:
+                return [prob0,prob1], 0
+              else:
+                return [prob0,prob1], 1
         
         
         
