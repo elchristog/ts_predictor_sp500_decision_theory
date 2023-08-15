@@ -34,7 +34,7 @@ def some_python_code(user_input):
     
       # Read the data into a pandas DataFrame
       data = pd.read_csv(url, na_values=['None'])
-      data = data.drop('date', axis=1)
+      data = data.drop(['date', "apertura",	"cierre",	"mejoro_respecto_cierre_anterior",	"crecion_nocturno",	"crecio_diurno"], axis=1)
     
       # Remove rows with null or None values
       data = data.dropna()
