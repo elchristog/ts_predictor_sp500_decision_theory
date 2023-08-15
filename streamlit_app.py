@@ -141,6 +141,7 @@ def some_python_code(user_input):
     # Read the data into a pandas DataFrame
     data = pd.read_csv(url, na_values=['None'])
     data = data.drop(['date', "apertura",	"cierre",	"mejoro_respecto_cierre_anterior",	"crecion_nocturno",	"crecio_diurno"], axis=1)
+    print(data.columns)
     last_row_with_data = data.dropna(how='all').iloc[-1]
     
     # Preserve only the columns with no null values
