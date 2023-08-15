@@ -50,66 +50,66 @@ def some_python_code(user_input):
         
         
         
-        def train_model(data_encoded, le, feature_columns, target_column):
-            
-              # Separate the data into features (X) and the target variable (y)
-              X = data_encoded[feature_columns]
-              y = data_encoded[target_column]
-            
-              # Apply SMOTE
-              oversample = SMOTE(k_neighbors=2) # aumentar o quitar cuando tenga mas data, por defecto seria 6
-              X, y = oversample.fit_resample(X, y)
-            
-              # Define base models
-              base_models = [
-                  ('gnb', GaussianNB()),
-                  ('dt', DecisionTreeClassifier(random_state=42)),
-                  ('knn', KNeighborsClassifier()),
-                  # ('rf', RandomForestClassifier(random_state=42)),
-                  ('svc', SVC(probability=True))
-              ]
-            
-              # Define meta-model
-              meta_model = LogisticRegression()
-            
-              # Create a StackingClassifier
-              clf = StackingClassifier(estimators=base_models, final_estimator=meta_model, cv=LeaveOneOut()) # LeaveOneOut pasarlo a 5 cuando tenga mas data para que sean 5 folds
-            
-              # Create a LeaveOneOut object
-              loo = LeaveOneOut()
-            
-              # Perform leave-one-out cross-validation
-              accuracy = []
-              tn = 0
-              fn = 0
-              fp = 0
-              tp = 0
-              for train_index, test_index in loo.split(X):
-                  X_train, X_test = X.iloc[train_index], X.iloc[test_index]
-                  y_train, y_test = y.iloc[train_index], y.iloc[test_index]
-            
-                  # Train the model
-                  clf.fit(X_train, y_train)
-            
-                  # Predict the target variable for the testing set
-                  y_pred = clf.predict(X_test)
-            
-                  # Compute the accuracy of the model
-                  accuracy.append(accuracy_score(y_test, y_pred))
-                  if (y_test.values[0] == 0) and (y_pred[0] == 0):
-                    tn = tn+1
-                  elif (y_test.values[0] == 0) and (y_pred[0] == 1):
-                    fn = fn+1
-                  elif (y_test.values[0] == 1) and (y_pred[0] == 0):
-                    fp = fp+1
-                  elif (y_test.values[0] == 1) and (y_pred[0] == 1):
-                    tp = tp+1
-            
-            
-              acc = sum(accuracy)/len(accuracy)
-              valores_confusion = np.array([[tn,fn],[fp,tp]])
-              print(f"{target_column} Accuracy in leave-one-out cross-validation: {acc}")
-              return clf, acc, valores_confusion
+    def train_model(data_encoded, le, feature_columns, target_column):
+        
+          # Separate the data into features (X) and the target variable (y)
+          X = data_encoded[feature_columns]
+          y = data_encoded[target_column]
+        
+          # Apply SMOTE
+          oversample = SMOTE(k_neighbors=2) # aumentar o quitar cuando tenga mas data, por defecto seria 6
+          X, y = oversample.fit_resample(X, y)
+        
+          # Define base models
+          base_models = [
+              ('gnb', GaussianNB()),
+              ('dt', DecisionTreeClassifier(random_state=42)),
+              ('knn', KNeighborsClassifier()),
+              # ('rf', RandomForestClassifier(random_state=42)),
+              ('svc', SVC(probability=True))
+          ]
+        
+          # Define meta-model
+          meta_model = LogisticRegression()
+        
+          # Create a StackingClassifier
+          clf = StackingClassifier(estimators=base_models, final_estimator=meta_model, cv=LeaveOneOut()) # LeaveOneOut pasarlo a 5 cuando tenga mas data para que sean 5 folds
+        
+          # Create a LeaveOneOut object
+          loo = LeaveOneOut()
+        
+          # Perform leave-one-out cross-validation
+          accuracy = []
+          tn = 0
+          fn = 0
+          fp = 0
+          tp = 0
+          for train_index, test_index in loo.split(X):
+              X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+              y_train, y_test = y.iloc[train_index], y.iloc[test_index]
+        
+              # Train the model
+              clf.fit(X_train, y_train)
+        
+              # Predict the target variable for the testing set
+              y_pred = clf.predict(X_test)
+        
+              # Compute the accuracy of the model
+              accuracy.append(accuracy_score(y_test, y_pred))
+              if (y_test.values[0] == 0) and (y_pred[0] == 0):
+                tn = tn+1
+              elif (y_test.values[0] == 0) and (y_pred[0] == 1):
+                fn = fn+1
+              elif (y_test.values[0] == 1) and (y_pred[0] == 0):
+                fp = fp+1
+              elif (y_test.values[0] == 1) and (y_pred[0] == 1):
+                tp = tp+1
+        
+        
+          acc = sum(accuracy)/len(accuracy)
+          valores_confusion = np.array([[tn,fn],[fp,tp]])
+          print(f"{target_column} Accuracy in leave-one-out cross-validation: {acc}")
+          return clf, acc, valores_confusion
             
         
         
